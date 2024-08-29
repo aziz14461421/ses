@@ -1,0 +1,311 @@
+{
+  "transfers": [
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/WsvuRrNt",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user0@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 1696756945319,
+      "extendedexpiredate": -1,
+      "sentdate": 1694163645047,
+      "status": "STATUS_COMPLETE",
+      "id": "fddhrppddmtghdz",
+      "trackid": "WsvuRrNt",
+      "url": "https://www.domain.com/t/WsvuRrNt",
+      "size": 7758359136,
+      "days": 30,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Elokuvan titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "Filmskolan"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 8,
+      "numberofdownloads": 9,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#7FAD46",
+      "iconletter": "M",
+      "ftphost": "3008.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": false,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    },
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/zNqALW6b",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 1696671194238,
+      "extendedexpiredate": -1,
+      "sentdate": 1694075395303,
+      "status": "STATUS_COMPLETE",
+      "id": "unjxuueifkulgsx",
+      "trackid": "zNqALW6b",
+      "url": "https://www.domain.com/t/zNqALW6b",
+      "size": 22119877644,
+      "days": 40,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Aziz titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "Filmskolan"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 8,
+      "numberofdownloads": 1,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#7FAD46",
+      "iconletter": "M",
+      "ftphost": "3009.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": false,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    },
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/VRbga2TA",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user1@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 1696667058313,
+      "extendedexpiredate": -1,
+      "sentdate": 1694075047843,
+      "status": "STATUS_COMPLETE",
+      "id": "iuukodieldqsvln",
+      "trackid": "VRbga2TA",
+      "url": "https://www.domain.com/t/VRbga2TA",
+      "size": 30182910,
+      "days": 50,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Elokuvan titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "Filmskolan"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 11,
+      "numberofdownloads": 1,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#8D6AC2",
+      "iconletter": "K",
+      "ftphost": "3009.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": false,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    },
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/1mBQ0FuM",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user2@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 1696591901898,
+      "extendedexpiredate": -1,
+      "sentdate": 1693992988786,
+      "status": "STATUS_COMPLETE",
+      "id": "zuhdqklcblrwcrv",
+      "trackid": "1mBQ0FuM",
+      "url": "https://www.domain.com/t/1mBQ0FuM",
+      "size": 38758996386,
+      "days": 60,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Elokuvan titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "Fat Dance"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 1,
+      "numberofdownloads": 1,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#C192D2",
+      "iconletter": "P",
+      "ftphost": "3012.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": false,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    },
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/0Haqvg87",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user3@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 1696437331220,
+      "extendedexpiredate": -1,
+      "sentdate": 1693837607594,
+      "status": "STATUS_COMPLETE",
+      "id": "qmsagveaqiyncla",
+      "trackid": "0Haqvg87",
+      "url": "https://www.domain.com/t/0Haqvg87",
+      "size": 31926633158,
+      "days": 80,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Elokuvan titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "Jasmin's Two Homes"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 14,
+      "numberofdownloads": 3,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#C192D2",
+      "iconletter": "P",
+      "ftphost": "3011.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": false,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    },
+    {
+      "to": [
+        "admin@domain.com"
+      ],
+      "recipients": [
+        {
+          "email": "admin@domain.com",
+          "downloadlink": "https://www.domain.com/t/tD74IqsC",
+          "delivered": true
+        }
+      ],
+      "failedRecipients": 0,
+      "from": "user4@gmail.com",
+      "subject": "",
+      "message": "",
+      "expiredate": 32503676400000,
+      "extendedexpiredate": -1,
+      "sentdate": 1622982676438,
+      "status": "STATUS_COMPLETE",
+      "id": "oprfioojadrttwh",
+      "trackid": "tD74IqsC",
+      "url": "https://www.domain.com/t/tD74IqsC",
+      "size": 984992600,
+      "days": 357415,
+      "isexpired": false,
+      "source": "Web",
+      "customfields": [
+        {
+          "label": "Elokuvan titteli",
+          "visible": false,
+          "rendertype": 0,
+          "value": "SES-alkutunnisteet_2021"
+        }
+      ],
+      "files": [],
+      "numberoffiles": 18,
+      "numberofdownloads": 124,
+      "downloads": [],
+      "passwordprotected": false,
+      "iconcolor": "#AD46A6",
+      "iconletter": "P",
+      "ftphost": "3008.domain.com",
+      "ftpcorppasswordrequired": false,
+      "udpthreshold": 10000,
+      "permanent": true,
+      "maxdays": 3650,
+      "alloweditingexpiredate": false,
+      "blockdownloads": false,
+      "infected": false,
+      "occupiesstorage": true
+    }
+  ],
+  "responsestatus": "OK"
+}
