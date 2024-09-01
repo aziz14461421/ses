@@ -87,8 +87,9 @@ fi
  # create the db table
  echo "Creating new DB table ses.files"
  mysql -u root -e "CREATE TABLE ses.files (
-    file_id CHAR(36) PRIMARY KEY DEFAULT (UUID()), 
-    transfer_id CHAR(36),
+    uuid VARCHAR(255) PRIMARY KEY DEFAULT (UUID()),
+    file_id VARCHAR(255),
+    transfer_id CHAR(255),
     filename VARCHAR(255),
     filesize BIGINT,
     download_url VARCHAR(255),
