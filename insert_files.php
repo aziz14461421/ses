@@ -66,33 +66,36 @@ if ($transfer_id_result && mysqli_num_rows($transfer_id_result) > 0) {
         $antivirus_scan_status = "Not Scanned"; // Assuming a default value
         $download_percentage = 0; // Assuming a default value
 
-        // SQL query to insert data into files table
-        $sql = "INSERT INTO files (
-            file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype, filetype_description,
-            category, small_preview, medium_preview, large_preview, has_custom_thumbnail, md5, suspected_damage, GID,
-            download_status, completed_size, percentage, custom_logo_url, compressed_file_url, compressed_file_status,
-            compressed_file_format, torrent_status, torrent_url, fileserver, fileserver_url, fileserver_url_main,
-            footer_text, antivirus_scan_status, download_percentage
-        ) VALUES (
-            '$file_id', '$transfer_id', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview',
-            '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview',
-            '$has_custom_thumbnail', '$md5', '$suspected_damage', '$GID', '$download_status', $completed_size,
-            $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format',
-            '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text',
-            '$antivirus_scan_status', $download_percentage
-        )";
+        // Check if the file_id already exists in the files table
+        $check_file_query = "SELECT file_id FROM files WHERE file_id = '$file_id'";
+        $check_file_result = mysqli_query($conn, $check_file_query);
 
-        // Execute the query and handle errors
-        try {
-            if (!mysqli_query($conn, $sql)) {
-                throw new Exception("MySQL error " . mysqli_error($conn) . " when executing query: " . $sql);
-            }
-            echo "New record created successfully for file ID: $file_id\n";
-        } catch (Exception $e) {
-            // Handle exception and print a custom error message
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                echo "Error: The file with the ID '$file_id' already exists in your DB.\n";
-            } else {
+        if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
+            echo "Error: The file with the ID '$file_id' already exists in your DB.\n";
+        } else {
+            // SQL query to insert data into files table
+            $sql = "INSERT INTO files (
+                file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype, filetype_description,
+                category, small_preview, medium_preview, large_preview, has_custom_thumbnail, md5, suspected_damage, GID,
+                download_status, completed_size, percentage, custom_logo_url, compressed_file_url, compressed_file_status,
+                compressed_file_format, torrent_status, torrent_url, fileserver, fileserver_url, fileserver_url_main,
+                footer_text, antivirus_scan_status, download_percentage
+            ) VALUES (
+                '$file_id', '$transfer_id', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview',
+                '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview',
+                '$has_custom_thumbnail', '$md5', '$suspected_damage', '$GID', '$download_status', $completed_size,
+                $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format',
+                '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text',
+                '$antivirus_scan_status', $download_percentage
+            )";
+
+            // Execute the query and handle errors
+            try {
+                if (!mysqli_query($conn, $sql)) {
+                    throw new Exception("MySQL error " . mysqli_error($conn) . " when executing query: " . $sql);
+                }
+                echo "New record created successfully for file ID: $file_id\n";
+            } catch (Exception $e) {
                 echo "Error: " . $e->getMessage() . "\n";
             }
         }
