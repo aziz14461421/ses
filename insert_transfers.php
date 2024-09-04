@@ -24,6 +24,10 @@ $data = json_decode($json_data, true);
 foreach ($data['transfers'] as $transfer) {
     // Extract values from JSON
     $to_email = $transfer['to'][0];
+    $recipients_email = $transfer['recipients'][0];    
+    $recipients_download_link = $transfer['recipients'][1];
+    $recipients_delivered = $transfer['recipients'][2]? 1 : 0;;
+    $failed_recipients = $transfers['failedRecipients']
     $from_email = $transfer['from'];
     $subject = $transfer['subject'];
     $message = $transfer['message'];
@@ -58,8 +62,8 @@ foreach ($data['transfers'] as $transfer) {
     $occupies_storage = $transfer['occupiesstorage'] ? 1 : 0;
 
     // SQL query to insert data into transfers table
-    $sql = "INSERT INTO transfers (id, to_email, from_email, subject, message, expire_date, extended_expire_date, sent_date, status, track_id, url, size, days, is_expired, source, custom_field_label, custom_field_visible, custom_field_render_type, custom_field_value, number_of_files, number_of_downloads, password_protected, icon_color, icon_letter, ftp_host, ftp_corp_password_required, udp_threshold, permanent, max_days, allow_editing_expire_date, block_downloads, infected, occupies_storage)
-    VALUES ('$id', '$to_email', '$from_email', '$subject', '$message', '$expire_date', '$extended_expire_date', '$sent_date', '$status', '$track_id', '$url', $size, $days, '$is_expired', '$source', '$custom_field_label', '$custom_field_visible', $custom_field_render_type, '$custom_field_value', $number_of_files, $number_of_downloads, '$password_protected', '$icon_color', '$icon_letter', '$ftp_host', '$ftp_corp_password_required', $udp_threshold, '$permanent', $max_days, '$allow_editing_expire_date', '$block_downloads', '$infected', '$occupies_storage')";
+    $sql = "INSERT INTO transfers (id, to_email, recipient_email, recipient_download_link, recipient_delivered, failed_recipients, from_email, subject, message, expire_date, extended_expire_date, sent_date, status, track_id, url, size, days, is_expired, source, custom_field_label, custom_field_visible, custom_field_render_type, custom_field_value, number_of_files, number_of_downloads, password_protected, icon_color, icon_letter, ftp_host, ftp_corp_password_required, udp_threshold, permanent, max_days, allow_editing_expire_date, block_downloads, infected, occupies_storage)
+    VALUES ('$id', '$to_email', '$recipients_email', '$recipients_download_link', '$recipients_delivered', '$failed_recipients', '$from_email', '$subject', '$message', '$expire_date', '$extended_expire_date', '$sent_date', '$status', '$track_id', '$url', $size, $days, '$is_expired', '$source', '$custom_field_label', '$custom_field_visible', $custom_field_render_type, '$custom_field_value', $number_of_files, $number_of_downloads, '$password_protected', '$icon_color', '$icon_letter', '$ftp_host', '$ftp_corp_password_required', $udp_threshold, '$permanent', $max_days, '$allow_editing_expire_date', '$block_downloads', '$infected', '$occupies_storage')";
 
     // Execute the query and handle errors
     try {

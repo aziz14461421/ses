@@ -1,6 +1,6 @@
 #!bin/bash
 
-
+function remove_transfers(
 # drop the DB table called ses.trasnfers.
 echo "Removing transfers table from the ses DB"
  mysql -u root -e "DROP TABLE ses.transfers"
@@ -64,9 +64,10 @@ fi
  # Check the creation of the DB table
  
   mysql -u root -e "DESCRIBE ses.transfers"
-  
+ ) 
 
 
+function remove_files(
 # drop the DB table called ses.files.
 echo "Removing files table from the ses DB"
  mysql -u root -e "DROP TABLE ses.files"
@@ -124,4 +125,9 @@ fi
 );"
  # Check the creation of the DB table
  
-  mysql -u root -e "DESCRIBE ses.files"
+ mysql -u root -e "DESCRIBE ses.files"
+)
+
+
+remove_files
+remove_transfers
