@@ -24,10 +24,10 @@ $data = json_decode($json_data, true);
 foreach ($data['transfers'] as $transfer) {
     // Extract values from JSON
     $to_email = $transfer['to'][0];
-    $recipients_email = $transfer['recipients'][0];    
-    $recipients_download_link = $transfer['recipients'][1];
-    $recipients_delivered = $transfer['recipients'][2]? 1 : 0;;
-    $failed_recipients = $transfers['failedRecipients']
+    $recipients_email = $transfer['recipients'][0]['email'];    
+    $recipients_download_link = $transfer['recipients'][0]['downloadlink'];
+    $recipients_delivered = $transfer['recipients'][0]['delivered']? 1 : 0;
+    $failed_recipients = $transfer['failedRecipients'];
     $from_email = $transfer['from'];
     $subject = $transfer['subject'];
     $message = $transfer['message'];
