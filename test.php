@@ -15,7 +15,10 @@ $response = curl_exec($ch);
 
 // Check for cURL errors
 if (curl_errno($ch)) {
+     // Output error message and stop script execution
     echo 'cURL Error: ' . curl_error($ch);
+    curl_close($ch);
+    exit();  // Stop script execution if the API request fails
 } else {
     // Decode the JSON response
     $json_data = json_decode($response, true);
