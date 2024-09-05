@@ -15,7 +15,7 @@ function createDB(
 function createDB_transfers(
  # create the db table
  echo "Creating new DB table ses.transfers"
-mysql -u root -e "CREATE TABLE ses.transfers (uuid CHAR(36) PRIMARY KEY DEFAULT (UUID()),id VARCHAR(255) UNIQUE,
+ mysql -u root -e "CREATE TABLE ses.transfers (uuid CHAR(36) PRIMARY KEY DEFAULT (UUID()),id VARCHAR(255),
     to_email VARCHAR(255),
     recipient_email VARCHAR(255),
     recipient_download_link VARCHAR(255),

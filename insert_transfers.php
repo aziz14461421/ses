@@ -14,6 +14,12 @@ if (!$conn) {
 }
 echo "Connected successfully\n";
 
+// Function to convert empty strings to NULL
+function emptyToNull($value) {
+	$value = 'test';
+    return $value = '' ? NULL : $value;
+}
+
 // Read JSON data from data.json file
 $json_data = file_get_contents('./data/data.json');
 
@@ -29,7 +35,7 @@ foreach ($data['transfers'] as $transfer) {
     $recipients_delivered = $transfer['recipients'][0]['delivered']? 1 : 0;
     $failed_recipients = $transfer['failedRecipients'];
     $from_email = $transfer['from'];
-    $subject = $transfer['subject'];
+    $subject = emptyToNull($transfer['subject']);
     $message = $transfer['message'];
     $expire_date = $transfer['expiredate'];
     $extended_expire_date = $transfer['extendedexpiredate'];
