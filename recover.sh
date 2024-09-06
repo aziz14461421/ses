@@ -96,6 +96,7 @@ function createDB_files(
     footer_text VARCHAR(255),
     antivirus_scan_status VARCHAR(50),
     download_percentage INT,
+    status VARCHAR(255),
     FOREIGN KEY (transfer_id) REFERENCES transfers(uuid)
 );"
  # Check the creation of the DB table
