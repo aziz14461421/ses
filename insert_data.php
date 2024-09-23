@@ -117,7 +117,7 @@ function insert_files($transfer_id)
             $check_file_query = "SELECT file_id, md5 FROM files WHERE file_id = '$file_id'";
             $check_file_result = mysqli_query($conn, $check_file_query);
 
-            if ($md5 === null) {
+            if ($md5 === null || $md5 == "") {
                 if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
                     echo "File details exist in DB and md5 is still missing for file ID: $file_id.\n";
                 } else {
