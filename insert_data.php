@@ -1,6 +1,6 @@
 <?php
 
-//API Connection test
+// API Connection Test
 // URL to send the GET request to
 $url = "http://echo.jsontest.com/key/value/one/two";
 
@@ -32,14 +32,11 @@ if ($response === false) {
 // Decode the JSON response
 $json_data = json_decode($response, true);
 
-// Define the file path where the JSON data will be saved
-$file_path = './response.json';
-
-// Save the JSON data to the file
-if (file_put_contents($file_path, json_encode($json_data, JSON_PRETTY_PRINT))) {
-    echo "JSON data successfully saved to $file_path";
+// Check if the response is valid JSON
+if (json_last_error() === JSON_ERROR_NONE) {
+    echo "API connection successfull, Received a valid JSON response.\n";
 } else {
-    echo "Failed to save JSON data to $file_path";
+    echo "API connection successfull, but the response is not valid JSON.\n";
 }
 
 // Close the cURL session
@@ -81,6 +78,31 @@ function insert_files($transfer_id)
     if ($transfer_uuid_result && mysqli_num_rows($transfer_uuid_result) > 0) {
         $transfer_uuid_row = mysqli_fetch_assoc($transfer_uuid_result);
         $transfer_uuid = $transfer_uuid_row['uuid'];
+	
+	if md5=null
+		then
+		if row exist on DB
+			then
+				echo "File details exist on DB and md5 still missing"
+			else
+
+				insert file details with null md5 and file_status=missing_md5
+			       echo "File details inserted to DB and md5 still missing"	
+
+		fi			
+	else md5!=null
+		then
+			if row exist on DB
+				then
+					insert md5 to DB and file_status=pending
+					echo "File details exist on DB and md5 exist"
+				else
+					insert file detials with md5 and file_status=pending
+					echo "File details inserted to DB and md5 exist"
+			fi
+	fi
+
+
 
         // Loop through each file in the JSON data
         foreach ($data['transfer']['files'] as $file) {
@@ -100,7 +122,7 @@ function insert_files($transfer_id)
             $has_custom_thumbnail = $file['hascustomthumbnail'] ? 1 : 0;
             $md5 = $file['md5'];
             $suspected_damage = $file['suspecteddamage'] ? 1 : 0;
-            $GID = $file['fileid']; // Assuming GID is the fileid
+            $gid = $file['fileid']; // Assuming GID is the fileid
             $download_status = "Pending"; // Assuming a default value
             $completed_size = 0; // Assuming a default value
             $percentage = 0; // Assuming a default value
@@ -116,28 +138,29 @@ function insert_files($transfer_id)
             $footer_text = $data['transfer']['footertext'];
             $antivirus_scan_status = "Not Scanned"; // Assuming a default value
             $download_percentage = 0; // Assuming a default value
+	    $file_status = empty($md5) ? "missing_md5" : "pending";
 
             // Check if the file_id already exists in the files table
             $check_file_query = "SELECT file_id FROM files WHERE file_id = '$file_id'";
             $check_file_result = mysqli_query($conn, $check_file_query);
 
             if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
-                echo "Error: The file with the ID '$file_id' already exists in your DB.\n";
+                echo "Warning: The file with the ID '$file_id' already exist in the DB.\n";
             } else {
                 // SQL query to insert data into files table
                 $sql = "INSERT INTO files (
                 file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype, filetype_description,
-                category, small_preview, medium_preview, large_preview, has_custom_thumbnail, md5, suspected_damage, GID,
+                category, small_preview, medium_preview, large_preview, has_custom_thumbnail, md5, suspected_damage, gid,
                 download_status, completed_size, percentage, custom_logo_url, compressed_file_url, compressed_file_status,
                 compressed_file_format, torrent_status, torrent_url, fileserver, fileserver_url, fileserver_url_main,
-                footer_text, antivirus_scan_status, download_percentage
+                footer_text, antivirus_scan_status, download_percentage, file_status
             ) VALUES (
                 '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview',
                 '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview',
-                '$has_custom_thumbnail', '$md5', '$suspected_damage', '$GID', '$download_status', $completed_size,
+                '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', '$download_status', $completed_size,
                 $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format',
                 '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text',
-                '$antivirus_scan_status', $download_percentage
+                '$antivirus_scan_status', $download_percentage, '$file_status'
             )";
 
                 // Execute the query and handle errors
@@ -176,14 +199,14 @@ $conn = mysqli_connect($servername, $username, $password, $database);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-echo "Connected successfully\n";
+echo "DB connection successfull\n";
 
-// Function to convert empty strings to NULL
+/* Function to convert empty strings to NULL
 function emptyToNull($value)
 {
     $value = 'test';
     return $value = '' ? NULL : $value;
-}
+}*/
 
 // Read JSON data from data.json file
 $json_data = file_get_contents('./data/data.json');
@@ -200,7 +223,7 @@ foreach ($data['transfers'] as $transfer) {
     $recipients_delivered = $transfer['recipients'][0]['delivered'] ? 1 : 0;
     $failed_recipients = $transfer['failedRecipients'];
     $from_email = $transfer['from'];
-    $subject = emptyToNull($transfer['subject']);
+    $subject = $transfer['subject'];
     $message = $transfer['message'];
     $expire_date = $transfer['expiredate'];
     $extended_expire_date = $transfer['extendedexpiredate'];
@@ -231,10 +254,10 @@ foreach ($data['transfers'] as $transfer) {
     $block_downloads = $transfer['blockdownloads'] ? 1 : 0;
     $infected = $transfer['infected'] ? 1 : 0;
     $occupies_storage = $transfer['occupiesstorage'] ? 1 : 0;
-
+    $transfer_status = 'pending';
     // SQL query to insert data into transfers table
-    $sql = "INSERT INTO transfers (id, to_email, recipient_email, recipient_download_link, recipient_delivered, failed_recipients, from_email, subject, message, expire_date, extended_expire_date, sent_date, status, track_id, url, size, days, is_expired, source, custom_field_label, custom_field_visible, custom_field_render_type, custom_field_value, number_of_files, number_of_downloads, password_protected, icon_color, icon_letter, ftp_host, ftp_corp_password_required, udp_threshold, permanent, max_days, allow_editing_expire_date, block_downloads, infected, occupies_storage)
-    VALUES ('$id', '$to_email', '$recipients_email', '$recipients_download_link', '$recipients_delivered', '$failed_recipients', '$from_email', '$subject', '$message', '$expire_date', '$extended_expire_date', '$sent_date', '$status', '$track_id', '$url', $size, $days, '$is_expired', '$source', '$custom_field_label', '$custom_field_visible', $custom_field_render_type, '$custom_field_value', $number_of_files, $number_of_downloads, '$password_protected', '$icon_color', '$icon_letter', '$ftp_host', '$ftp_corp_password_required', $udp_threshold, '$permanent', $max_days, '$allow_editing_expire_date', '$block_downloads', '$infected', '$occupies_storage')";
+    $sql = "INSERT INTO transfers (id, to_email, recipient_email, recipient_download_link, recipient_delivered, failed_recipients, from_email, subject, message, expire_date, extended_expire_date, sent_date, status, track_id, url, size, days, is_expired, source, custom_field_label, custom_field_visible, custom_field_render_type, custom_field_value, number_of_files, number_of_downloads, password_protected, icon_color, icon_letter, ftp_host, ftp_corp_password_required, udp_threshold, permanent, max_days, allow_editing_expire_date, block_downloads, infected, occupies_storage, transfer_status)
+    VALUES ('$id', '$to_email', '$recipients_email', '$recipients_download_link', '$recipients_delivered', '$failed_recipients', '$from_email', '$subject', '$message', '$expire_date', '$extended_expire_date', '$sent_date', '$status', '$track_id', '$url', $size, $days, '$is_expired', '$source', '$custom_field_label', '$custom_field_visible', $custom_field_render_type, '$custom_field_value', $number_of_files, $number_of_downloads, '$password_protected', '$icon_color', '$icon_letter', '$ftp_host', '$ftp_corp_password_required', $udp_threshold, '$permanent', $max_days, '$allow_editing_expire_date', '$block_downloads', '$infected', '$occupies_storage', '$transfer_status')";
 
     // Execute the query and handle errors
     try {

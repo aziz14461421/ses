@@ -80,7 +80,7 @@ function createDB_files(
     has_custom_thumbnail BOOLEAN,
     md5 VARCHAR(32),
     suspected_damage BOOLEAN,
-    GID VARCHAR(255),
+    gid VARCHAR(255),
     download_status VARCHAR(255),
     completed_size INT,
     percentage INT,
@@ -96,7 +96,7 @@ function createDB_files(
     footer_text VARCHAR(255),
     antivirus_scan_status VARCHAR(50),
     download_percentage INT,
-    status VARCHAR(255),
+    file_status VARCHAR(255),
     FOREIGN KEY (transfer_id) REFERENCES transfers(uuid)
 );"
  # Check the creation of the DB table
