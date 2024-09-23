@@ -57,7 +57,6 @@ function insert_files($transfer_id)
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
-   
 
     $json_file_path = './data/' . $transfer_id . '.json';
     if (!file_exists($json_file_path)) {
@@ -78,31 +77,6 @@ function insert_files($transfer_id)
     if ($transfer_uuid_result && mysqli_num_rows($transfer_uuid_result) > 0) {
         $transfer_uuid_row = mysqli_fetch_assoc($transfer_uuid_result);
         $transfer_uuid = $transfer_uuid_row['uuid'];
-	
-	if md5=null
-		then
-		if row exist on DB
-			then
-				echo "File details exist on DB and md5 still missing"
-			else
-
-				insert file details with null md5 and file_status=missing_md5
-			       echo "File details inserted to DB and md5 still missing"	
-
-		fi			
-	else md5!=null
-		then
-			if row exist on DB
-				then
-					insert md5 to DB and file_status=pending
-					echo "File details exist on DB and md5 exist"
-				else
-					insert file detials with md5 and file_status=pending
-					echo "File details inserted to DB and md5 exist"
-			fi
-	fi
-
-
 
         // Loop through each file in the JSON data
         foreach ($data['transfer']['files'] as $file) {
@@ -138,39 +112,70 @@ function insert_files($transfer_id)
             $footer_text = $data['transfer']['footertext'];
             $antivirus_scan_status = "Not Scanned"; // Assuming a default value
             $download_percentage = 0; // Assuming a default value
-	    $file_status = empty($md5) ? "missing_md5" : "pending";
 
             // Check if the file_id already exists in the files table
-            $check_file_query = "SELECT file_id FROM files WHERE file_id = '$file_id'";
+            $check_file_query = "SELECT file_id, md5 FROM files WHERE file_id = '$file_id'";
             $check_file_result = mysqli_query($conn, $check_file_query);
 
-            if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
-                echo "Warning: The file with the ID '$file_id' already exist in the DB.\n";
-            } else {
-                // SQL query to insert data into files table
-                $sql = "INSERT INTO files (
-                file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype, filetype_description,
-                category, small_preview, medium_preview, large_preview, has_custom_thumbnail, md5, suspected_damage, gid,
-                download_status, completed_size, percentage, custom_logo_url, compressed_file_url, compressed_file_status,
-                compressed_file_format, torrent_status, torrent_url, fileserver, fileserver_url, fileserver_url_main,
-                footer_text, antivirus_scan_status, download_percentage, file_status
-            ) VALUES (
-                '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview',
-                '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview',
-                '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', '$download_status', $completed_size,
-                $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format',
-                '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text',
-                '$antivirus_scan_status', $download_percentage, '$file_status'
-            )";
+            if ($md5 === null) {
+                if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
+                    echo "File details exist in DB and md5 is still missing for file ID: $file_id.\n";
+                } else {
+                    // Insert file details with null md5 and file_status = 'missing_md5'
+                    $file_status = 'missing_md5';
+                    $sql = "INSERT INTO files (
+                        file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype,
+                        filetype_description, category, small_preview, medium_preview, large_preview, has_custom_thumbnail, 
+                        md5, suspected_damage, gid, download_status, completed_size, percentage, custom_logo_url, 
+                        compressed_file_url, compressed_file_status, compressed_file_format, torrent_status, torrent_url, 
+                        fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, download_percentage, file_status
+                    ) VALUES (
+                        '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview', 
+                        '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview', 
+                        '$has_custom_thumbnail', NULL, '$suspected_damage', '$gid', '$download_status', $completed_size, 
+                        $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
+                        '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
+                        '$antivirus_scan_status', $download_percentage, '$file_status'
+                    )";
 
-                // Execute the query and handle errors
-                try {
-                    if (!mysqli_query($conn, $sql)) {
-                        throw new Exception("MySQL error " . mysqli_error($conn) . " when executing query: " . $sql);
+                    if (mysqli_query($conn, $sql)) {
+                        echo "File details inserted to DB and md5 is still missing for file ID: $file_id.\n";
+                    } else {
+                        echo "Error inserting file with missing md5: " . mysqli_error($conn) . "\n";
                     }
-                    echo "New file created successfully for file ID: $file_id\n";
-                } catch (Exception $e) {
-                    echo "Error: " . $e->getMessage() . "\n";
+                }
+            } else {
+                if ($check_file_result && mysqli_num_rows($check_file_result) > 0) {
+                    // Update md5 and set file_status to 'pending'
+                    $sql_update = "UPDATE files SET md5 = '$md5', file_status = 'pending' WHERE file_id = '$file_id'";
+                    if (mysqli_query($conn, $sql_update)) {
+                        echo "File details exist in DB and md5 updated for file ID: $file_id.\n";
+                    } else {
+                        echo "Error updating file with md5: " . mysqli_error($conn) . "\n";
+                    }
+                } else {
+                    // Insert file details with md5 and file_status = 'pending'
+                    $file_status = 'pending';
+                    $sql = "INSERT INTO files (
+                        file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype,
+                        filetype_description, category, small_preview, medium_preview, large_preview, has_custom_thumbnail, 
+                        md5, suspected_damage, gid, download_status, completed_size, percentage, custom_logo_url, 
+                        compressed_file_url, compressed_file_status, compressed_file_format, torrent_status, torrent_url, 
+                        fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, download_percentage, file_status
+                    ) VALUES (
+                        '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview', 
+                        '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview', 
+                        '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', '$download_status', $completed_size, 
+                        $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
+                        '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
+                        '$antivirus_scan_status', $download_percentage, '$file_status'
+                    )";
+
+                    if (mysqli_query($conn, $sql)) {
+                        echo "File details inserted to DB and md5 is present for file ID: $file_id.\n";
+                    } else {
+                        echo "Error inserting file with md5: " . mysqli_error($conn) . "\n";
+                    }
                 }
             }
         }
@@ -178,7 +183,7 @@ function insert_files($transfer_id)
         echo "Error: Transfer with ID '$transfer_id' not found in transfers table.\n";
     }
 
-    // Close the connection
+    // Close the database connection
     mysqli_close($conn);
 }
 /********************************************************************************************** */
