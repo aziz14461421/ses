@@ -11,6 +11,7 @@ function db_connect() {
 
 // Function 1: send_uri - Send download URIs to aria2c
 function send_uri($uuid) {
+    echo "Sending URIs for transfer UUID: $uuid...\n";
     $db = db_connect();
 
     // Fetch download links and md5 for the specified uuid
@@ -30,12 +31,13 @@ function send_uri($uuid) {
             'jsonrpc' => '2.0',
             'method' => 'aria2.addUri',
             'id' => 'download',
-            'params' => [[ $downloadUrl ], ['md5' => $md5]]
+            'params' => [[$downloadUrl], ['md5' => $md5]]
         ];
         $ariaResponse = send_to_aria(json_encode($ariaRequest));
 
         if ($ariaResponse && isset($ariaResponse->result)) {
             $gid = $ariaResponse->result;  // The GID from aria2c
+            echo "File ID: $file_id sent to aria2c with GID: $gid\n";
             // Update file status in the database
             $updateQuery = "UPDATE files SET download_status = 'sent_to_aria', gid = ? WHERE file_id = ?";
             $updateStmt = $db->prepare($updateQuery);
@@ -50,6 +52,7 @@ function send_uri($uuid) {
     $updatePackageStmt->bind_param("s", $uuid);
     $updatePackageStmt->execute();
 
+    echo "Transfer UUID: $uuid is now queued.\n";
     $stmt->close();
     $db->close();
 }
@@ -66,6 +69,7 @@ function send_to_aria($jsonPayload) {
 
 // Function 2: update_uri - Monitor progress and update status in the database
 function update_uri() {
+    echo "Updating download progress...\n";
     $db = db_connect();
 
     // Get all files with status 'downloading'
@@ -96,6 +100,8 @@ function update_uri() {
             $updateStmt = $db->prepare($updateQuery);
             $updateStmt->bind_param("dssi", $completedLength, $percentage, $status, $file_id);
             $updateStmt->execute();
+            
+            echo "File ID: $file_id - Status: $status - Progress: $percentage%\n";
         }
     }
 
@@ -104,6 +110,7 @@ function update_uri() {
 
 // Function 3: aria2_error - Handle aria2c download errors
 function aria2_error() {
+    echo "Checking for download errors...\n";
     $db = db_connect();
 
     // Get all files with an error
@@ -125,6 +132,7 @@ function aria2_error() {
 
         if ($ariaResponse && isset($ariaResponse->result)) {
             $errorCode = $ariaResponse->result->errorCode;
+            echo "File ID: $file_id encountered an error - Error Code: $errorCode\n";
             // Log the error code and update the database
             $updateQuery = "UPDATE files SET error_code = ? WHERE file_id = ?";
             $updateStmt = $db->prepare($updateQuery);
@@ -138,6 +146,7 @@ function aria2_error() {
 
 // Function 4: update_package - Update package status based on file statuses
 function update_package($uuid) {
+    echo "Updating package status for UUID: $uuid...\n";
     $db = db_connect();
 
     // Check if all files in the package have completed
@@ -161,6 +170,9 @@ function update_package($uuid) {
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bind_param("s", $uuid);
         $updateStmt->execute();
+        echo "Transfer UUID: $uuid has been marked as completed.\n";
+    } else {
+        echo "Transfer UUID: $uuid is not yet complete.\n";
     }
 
     $stmt->close();
@@ -169,6 +181,7 @@ function update_package($uuid) {
 
 // Function 5: stage_complete - Mark files and package as fully completed
 function stage_complete($uuid) {
+    echo "Marking files and package as fully completed for UUID: $uuid...\n";
     $db = db_connect();
 
     // Mark all files related to this transfer as completed
@@ -183,10 +196,13 @@ function stage_complete($uuid) {
     $updateTransferStmt->bind_param("s", $uuid);
     $updateTransferStmt->execute();
 
+    echo "Transfer UUID: $uuid has been fully completed.\n";
     $db->close();
 }
+
 // Main process to handle all transfers
 function process_transfers() {
+    echo "Starting transfer processing...\n";
     $db = db_connect();
 
     // Fetch all transfers that have files
@@ -205,10 +221,10 @@ function process_transfers() {
     }
 
     $db->close();
+    echo "Transfer processing completed.\n";
 }
 
-
+// Example usage
 process_transfers();
-
 
 ?>
