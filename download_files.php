@@ -21,6 +21,11 @@ function send_uri($uuid) {
     $stmt->execute();
     $result = $stmt->get_result();
 
+    if ($result->num_rows === 0) {
+        echo "No files found for transfer UUID: $uuid.\n";
+        return; // Exit if no files found
+    }
+
     while ($row = $result->fetch_assoc()) {
         $downloadUrl = $row['download_url'];
         $md5 = $row['md5'];
@@ -76,6 +81,11 @@ function update_uri() {
     $query = "SELECT file_id, gid FROM files WHERE download_status = 'downloading'";
     $result = $db->query($query);
 
+    if ($result->num_rows === 0) {
+        echo "No files are currently downloading.\n";
+        return; // Exit if no files found
+    }
+
     while ($row = $result->fetch_assoc()) {
         $gid = $row['gid'];
         $file_id = $row['file_id'];
@@ -116,6 +126,11 @@ function aria2_error() {
     // Get all files with an error
     $query = "SELECT file_id, gid FROM files WHERE download_status = 'error'";
     $result = $db->query($query);
+
+    if ($result->num_rows === 0) {
+        echo "No files have encountered errors.\n";
+        return; // Exit if no errors found
+    }
 
     while ($row = $result->fetch_assoc()) {
         $gid = $row['gid'];
@@ -209,22 +224,23 @@ function process_transfers() {
     $query = "SELECT uuid FROM transfers WHERE EXISTS (SELECT 1 FROM files WHERE transfer_id = uuid)";
     $result = $db->query($query);
 
-    while ($row = $result->fetch_assoc()) {
-        $uuid = $row['uuid'];
-        
-        // Call functions for each transfer
-        send_uri($uuid);      // Start the download
-        update_uri();         // Monitor download progress
-        aria2_error();        // Handle errors if any
-        update_package($uuid); // Update package status based on files
-        stage_complete($uuid); // Mark the package as complete
+    if ($result->num_rows === 0) {
+        echo "No transfers found with associated files.\n";
+        return; // Exit if no transfers found
     }
 
-    $db->close();
+    while ($row = $result->fetch_assoc()) {
+        $uuid = $row['uuid'];
+        send_uri($uuid);
+        update_uri();
+        aria2_error();
+        update_package($uuid);
+    }
+
     echo "Transfer processing completed.\n";
+    $db->close();
 }
 
-// Example usage
+// Execute the process
 process_transfers();
-
 ?>
