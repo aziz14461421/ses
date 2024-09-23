@@ -44,7 +44,7 @@ function send_uri($uuid) {
             $gid = $ariaResponse->result;  // The GID from aria2c
             echo "File ID: $file_id sent to aria2c with GID: $gid\n";
             // Update file status in the database
-            $updateQuery = "UPDATE files SET download_status = 'sent_to_aria', gid = ? WHERE file_id = ?";
+            $updateQuery = "UPDATE files SET file_status = 'sent_to_aria', gid = ? WHERE file_id = ?";
             $updateStmt = $db->prepare($updateQuery);
             $updateStmt->bind_param("si", $gid, $file_id);
             $updateStmt->execute();
@@ -78,7 +78,7 @@ function update_uri() {
     $db = db_connect();
 
     // Get all files with status 'downloading'
-    $query = "SELECT file_id, gid FROM files WHERE download_status = 'downloading'";
+    $query = "SELECT file_id, gid FROM files WHERE file_status = 'downloading'";
     $result = $db->query($query);
 
     if ($result->num_rows === 0) {
@@ -106,7 +106,7 @@ function update_uri() {
 
             // Update database with download progress
             $percentage = ($totalLength > 0) ? ($completedLength / $totalLength) * 100 : 0;
-            $updateQuery = "UPDATE files SET completed_size = ?, download_percentage = ?, download_status = ? WHERE file_id = ?";
+            $updateQuery = "UPDATE files SET completed_size = ?, download_percentage = ?, file_status = ? WHERE file_id = ?";
             $updateStmt = $db->prepare($updateQuery);
             $updateStmt->bind_param("dssi", $completedLength, $percentage, $status, $file_id);
             $updateStmt->execute();
@@ -124,7 +124,7 @@ function aria2_error() {
     $db = db_connect();
 
     // Get all files with an error
-    $query = "SELECT file_id, gid FROM files WHERE download_status = 'error'";
+    $query = "SELECT file_id, gid FROM files WHERE file_status = 'error'";
     $result = $db->query($query);
 
     if ($result->num_rows === 0) {
@@ -165,7 +165,7 @@ function update_package($uuid) {
     $db = db_connect();
 
     // Check if all files in the package have completed
-    $query = "SELECT download_status FROM files WHERE transfer_id = ?";
+    $query = "SELECT file_status FROM files WHERE transfer_id = ?";
     $stmt = $db->prepare($query);
     $stmt->bind_param("s", $uuid);
     $stmt->execute();
@@ -173,7 +173,7 @@ function update_package($uuid) {
 
     $allComplete = true;
     while ($row = $result->fetch_assoc()) {
-        if ($row['download_status'] != 'completed') {
+        if ($row['file_status'] != 'completed') {
             $allComplete = false;
             break;
         }
@@ -200,7 +200,7 @@ function stage_complete($uuid) {
     $db = db_connect();
 
     // Mark all files related to this transfer as completed
-    $updateFilesQuery = "UPDATE files SET download_status = 'completed' WHERE transfer_id = ?";
+    $updateFilesQuery = "UPDATE files SET file_status = 'completed' WHERE transfer_id = ?";
     $updateFilesStmt = $db->prepare($updateFilesQuery);
     $updateFilesStmt->bind_param("s", $uuid);
     $updateFilesStmt->execute();
