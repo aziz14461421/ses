@@ -97,7 +97,6 @@ function insert_files($transfer_id)
             $md5 = $file['md5'];
             $suspected_damage = $file['suspecteddamage'] ? 1 : 0;
             $gid = '';
-            $download_status = "Pending"; // Assuming a default value
             $completed_size = 0; // Assuming a default value
             $percentage = 0; // Assuming a default value
             $custom_logo_url = $data['transfer']['customlogourl'];
@@ -126,13 +125,13 @@ function insert_files($transfer_id)
                     $sql = "INSERT INTO files (
                         file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype,
                         filetype_description, category, small_preview, medium_preview, large_preview, has_custom_thumbnail, 
-                        md5, suspected_damage, gid, download_status, completed_size, percentage, custom_logo_url, 
+                        md5, suspected_damage, gid, completed_size, percentage, custom_logo_url, 
                         compressed_file_url, compressed_file_status, compressed_file_format, torrent_status, torrent_url, 
                         fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, download_percentage, file_status
                     ) VALUES (
                         '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview', 
                         '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview', 
-                        '$has_custom_thumbnail', NULL, '$suspected_damage', '$gid', '$download_status', $completed_size, 
+                        '$has_custom_thumbnail', NULL, '$suspected_damage', '$gid', $completed_size, 
                         $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
                         '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
                         '$antivirus_scan_status', '$file_status'
@@ -159,13 +158,13 @@ function insert_files($transfer_id)
                     $sql = "INSERT INTO files (
                         file_id, transfer_id, filename, filesize, download_url, preview_url, has_custom_preview, filetype,
                         filetype_description, category, small_preview, medium_preview, large_preview, has_custom_thumbnail, 
-                        md5, suspected_damage, gid, download_status, completed_size, percentage, custom_logo_url, 
+                        md5, suspected_damage, gid, completed_size, percentage, custom_logo_url, 
                         compressed_file_url, compressed_file_status, compressed_file_format, torrent_status, torrent_url, 
                         fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, file_status
                     ) VALUES (
                         '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview', 
                         '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview', 
-                        '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', '$download_status', $completed_size, 
+                        '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', $completed_size, 
                         $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
                         '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
                         '$antivirus_scan_status', '$file_status'

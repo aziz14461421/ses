@@ -63,7 +63,56 @@ try {
     die('Database connection failed: ' . $e->getMessage());
 }
 
-// Main loop for downloading and showing progress
+// Handle incoming API requests
+$method = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
+
+// Fetch ongoing transfers
+if ($method === 'GET' && $uri === '/getTransfers') {
+    $stmt = $pdo->query("SELECT f.gid, f.transfer_id, f.filename, f.file_status as status, t.uuid 
+                         FROM files f
+                         INNER JOIN transfers t ON f.transfer_id = t.uuid
+                         WHERE t.transfer_status IS NULL OR t.transfer_status != 'completed'");
+    $transfers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($transfers);
+    exit;
+}
+
+// Handle control actions like pause, resume, delete
+if ($method === 'POST' && $uri === '/controlTransfer') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $gid = $input['gid'];
+    $action = $input['action'];
+
+    $response = [];
+    switch ($action) {
+        case 'pause':
+            $response = sendRpcRequest('aria2.pause', [$gid]);
+            break;
+        case 'resume':
+            $response = sendRpcRequest('aria2.unpause', [$gid]);
+            break;
+        case 'delete':
+            $response = sendRpcRequest('aria2.remove', [$gid]);
+            break;
+        case 'download':
+            // Assuming you have logic to initiate a download based on the gid
+            $response = sendRpcRequest('aria2.addUri', [[/* URIs */, ['gid' => $gid]]]);
+            break;
+        default:
+            echo json_encode(['message' => 'Unknown action']);
+            exit;
+    }
+
+    if (isset($response['error'])) {
+        echo json_encode(['message' => 'Failed to execute action: ' . $response['error']['message']]);
+    } else {
+        echo json_encode(['message' => ucfirst($action) . ' action performed successfully']);
+    }
+    exit;
+}
+
+// Main loop for monitoring downloads
 while (true) {
     // Clear the terminal
     system('clear');
@@ -72,7 +121,7 @@ while (true) {
     $query = "SELECT uuid FROM transfers WHERE transfer_status IS NULL OR transfer_status != 'completed'";
     $stmt = $pdo->query($query);
     $transfers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Check if there are any transfers
     if (empty($transfers)) {
         echo "No transfers to process.\n";
@@ -84,18 +133,18 @@ while (true) {
 
         // Fetch all files for the current transfer
         $query = "SELECT gid, file_status FROM files WHERE transfer_id = ?";
-	$stmt = $pdo->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->execute([$transferId]);
         $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $allFilesComplete = true; // Flag to check if all files of the current transfer are complete
 
         foreach ($files as $file) {
-	    $gid = $file['gid'];
+            $gid = $file['gid'];
             $fileStatus = $file['file_status'];
 
             // If the file is not complete, get its status
-            if ($fileStatus !== 'complete') {
+            if ($fileStatus !== 'completed') {
                 $statusResponse = sendRpcRequest('aria2.tellStatus', [$gid]);
 
                 if (isset($statusResponse['result'])) {
