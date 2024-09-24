@@ -96,7 +96,7 @@ function insert_files($transfer_id)
             $has_custom_thumbnail = $file['hascustomthumbnail'] ? 1 : 0;
             $md5 = $file['md5'];
             $suspected_damage = $file['suspecteddamage'] ? 1 : 0;
-            $gid = $file['fileid']; // Assuming GID is the fileid
+            $gid = '';
             $download_status = "Pending"; // Assuming a default value
             $completed_size = 0; // Assuming a default value
             $percentage = 0; // Assuming a default value
