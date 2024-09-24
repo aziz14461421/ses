@@ -81,7 +81,6 @@ function createDB_files(
     md5 VARCHAR(32),
     suspected_damage BOOLEAN,
     gid VARCHAR(255),
-    download_status VARCHAR(255),
     completed_size INT,
     percentage INT,
     custom_logo_url VARCHAR(255),
