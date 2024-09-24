@@ -95,7 +95,6 @@ function createDB_files(
     fileserver_url_main VARCHAR(255),
     footer_text VARCHAR(255),
     antivirus_scan_status VARCHAR(50),
-    download_percentage INT,
     file_status VARCHAR(255),
     FOREIGN KEY (transfer_id) REFERENCES transfers(uuid)
 );"

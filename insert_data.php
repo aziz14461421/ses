@@ -111,7 +111,7 @@ function insert_files($transfer_id)
             $fileserver_url_main = $data['transfer']['fileserverurl_main'];
             $footer_text = $data['transfer']['footertext'];
             $antivirus_scan_status = "Not Scanned"; // Assuming a default value
-            $download_percentage = 0; // Assuming a default value
+            
 
             // Check if the file_id already exists in the files table
             $check_file_query = "SELECT file_id, md5 FROM files WHERE file_id = '$file_id'";
@@ -135,7 +135,7 @@ function insert_files($transfer_id)
                         '$has_custom_thumbnail', NULL, '$suspected_damage', '$gid', '$download_status', $completed_size, 
                         $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
                         '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
-                        '$antivirus_scan_status', $download_percentage, '$file_status'
+                        '$antivirus_scan_status', '$file_status'
                     )";
 
                     if (mysqli_query($conn, $sql)) {
@@ -161,14 +161,14 @@ function insert_files($transfer_id)
                         filetype_description, category, small_preview, medium_preview, large_preview, has_custom_thumbnail, 
                         md5, suspected_damage, gid, download_status, completed_size, percentage, custom_logo_url, 
                         compressed_file_url, compressed_file_status, compressed_file_format, torrent_status, torrent_url, 
-                        fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, download_percentage, file_status
+                        fileserver, fileserver_url, fileserver_url_main, footer_text, antivirus_scan_status, file_status
                     ) VALUES (
                         '$file_id', '$transfer_uuid', '$filename', $filesize, '$download_url', '$preview_url', '$has_custom_preview', 
                         '$filetype', '$filetype_description', '$category', '$small_preview', '$medium_preview', '$large_preview', 
                         '$has_custom_thumbnail', '$md5', '$suspected_damage', '$gid', '$download_status', $completed_size, 
                         $percentage, '$custom_logo_url', '$compressed_file_url', '$compressed_file_status', '$compressed_file_format', 
                         '$torrent_status', '$torrent_url', '$fileserver', '$fileserver_url', '$fileserver_url_main', '$footer_text', 
-                        '$antivirus_scan_status', $download_percentage, '$file_status'
+                        '$antivirus_scan_status', '$file_status'
                     )";
 
                     if (mysqli_query($conn, $sql)) {
