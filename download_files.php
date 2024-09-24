@@ -37,22 +37,8 @@ function sendRpcRequest($method, $params = array()) {
 
 // Function to update download status in the database
 function updateDownloadStatus($pdo, $gid, $status, $completedSize, $percentage) {
-    try {
-        $stmt = $pdo->prepare("UPDATE files SET file_status = ?, completed_size = ?, percentage = ? WHERE gid = ?");
-        $stmt->execute([$status, $completedSize, $percentage, $gid]);
-    } catch (PDOException $e) {
-        echo "Error updating download status: " . $e->getMessage() . "\n";
-    }
-}
-
-// Function to update transfer status in the transfers table
-function updateTransferStatus($pdo, $transferId) {
-    try {
-        $stmt = $pdo->prepare("UPDATE transfers SET transfer_status = 'completed' WHERE uuid = ?");
-        $stmt->execute([$transferId]);
-    } catch (PDOException $e) {
-        echo "Error updating transfer status: " . $e->getMessage() . "\n";
-    }
+    $stmt = $pdo->prepare("UPDATE files SET file_status = ?, completed_size = ?, percentage = ? WHERE GID = ?");
+    $stmt->execute([$status, $completedSize, $percentage, $gid]);
 }
 
 // Connect to the MySQL database
@@ -68,71 +54,84 @@ while (true) {
     // Clear the terminal
     system('clear');
 
-    // Fetch all ongoing transfers
-    $query = "SELECT uuid FROM transfers WHERE transfer_status IS NULL OR transfer_status != 'completed'";
+    // Fetch all download URIs from the files table
+    $query = "SELECT file_id, download_url, gid FROM files WHERE file_status IS NULL OR file_status != 'complete'";
     $stmt = $pdo->query($query);
-    $transfers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Check if there are any transfers
-    if (empty($transfers)) {
-        echo "No transfers to process.\n";
+    $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Send each file URL to aria2c for downloading if not already started
+    foreach ($files as $file) {
+        $downloadUrl = $file['download_url'];
+        $fileId = $file['file_id'];
+
+        // Check if file already has a GID (existing download), or start a new one
+        if (empty($file['gid'])) {
+            // Start a new download via aria2c, specifying the directory for the downloaded file
+            $response = sendRpcRequest('aria2.addUri', [[ $downloadUrl ], ['dir' => $downloadDir]]);
+
+            if (isset($response['result'])) {
+                // Get the GID from the response
+                $gid = $response['result'];
+
+                // Save the GID in the database
+                $stmt = $pdo->prepare("UPDATE files SET gid = ? WHERE file_id = ?");
+                $stmt->execute([$gid, $fileId]);
+
+                echo "Download started for file ID $fileId with GID: $gid\n";
+            } else {
+                echo "Failed to start download for file ID $fileId: " . json_encode($response) . "\n";
+            }
+        }
+    }
+
+    // Periodically check the status of ongoing downloads
+    $query = "SELECT gid FROM files WHERE file_status IS NULL OR file_status != 'complete'";
+    $stmt = $pdo->query($query);
+    $downloads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $allDownloadsComplete = true; // Flag to check if all downloads are complete
+
+    foreach ($downloads as $download) {
+        $gid = $download['gid'];
+
+        // Get the status of the download from aria2c
+        $statusResponse = sendRpcRequest('aria2.tellStatus', [$gid]);
+
+        if (isset($statusResponse['result'])) {
+            $status = $statusResponse['result']['status'];
+            $completedSize = $statusResponse['result']['completedLength'];
+            $totalLength = $statusResponse['result']['totalLength'];
+
+            // Calculate the percentage manually
+            $percentage = ($totalLength > 0) ? ($completedSize / $totalLength) * 100 : 0;
+
+            // Update the database with the download status
+            updateDownloadStatus($pdo, $gid, $status, $completedSize, round($percentage, 2));
+
+            echo "Download status for GID $gid: $status, Completed: $completedSize bytes, Percentage: " . round($percentage, 2) . "%\n";
+
+            // If the download is complete, update the status in the database
+            if ($status === 'complete') {
+                // Update the file status to 'downloaded'
+                updateDownloadStatus($pdo, $gid, 'downloaded', $completedSize, 100);
+                echo "Download complete for GID: $gid\n";
+            } else {
+                $allDownloadsComplete = false; // At least one download is still in progress
+            }
+        } else {
+            echo "Failed to fetch status for GID $gid: " . json_encode($statusResponse) . "\n";
+        }
+    }
+
+    // If all downloads are complete, exit the loop
+    if ($allDownloadsComplete) {
+        echo "All downloads are complete.\n";
         break;
     }
 
-    foreach ($transfers as $transfer) {
-        $transferId = $transfer['uuid'];
-
-        // Fetch all files for the current transfer
-        $query = "SELECT gid, file_status FROM files WHERE transfer_id = ?";
-	$stmt = $pdo->prepare($query);
-        $stmt->execute([$transferId]);
-        $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $allFilesComplete = true; // Flag to check if all files of the current transfer are complete
-
-        foreach ($files as $file) {
-	    $gid = $file['gid'];
-            $fileStatus = $file['file_status'];
-
-            // If the file is not complete, get its status
-            if ($fileStatus !== 'complete') {
-                $statusResponse = sendRpcRequest('aria2.tellStatus', [$gid]);
-
-                if (isset($statusResponse['result'])) {
-                    $status = $statusResponse['result']['status'];
-                    $completedSize = $statusResponse['result']['completedLength'];
-                    $totalLength = $statusResponse['result']['totalLength'];
-
-                    // Calculate the percentage
-                    $percentage = ($totalLength > 0) ? ($completedSize / $totalLength) * 100 : 0;
-
-                    // Update the download status
-                    updateDownloadStatus($pdo, $gid, $status, $completedSize, round($percentage, 2));
-
-                    echo "Download status for GID $gid: $status, Completed: $completedSize bytes, Percentage: " . round($percentage, 2) . "%\n";
-
-                    // Check if the download is complete
-                    if ($status === 'complete') {
-                        updateDownloadStatus($pdo, $gid, 'completed', $completedSize, 100);
-                    } else {
-                        $allFilesComplete = false; // At least one file is still downloading
-                    }
-                } else {
-                    echo "Failed to fetch status for GID $gid: " . json_encode($statusResponse) . "\n";
-                    $allFilesComplete = false; // Continue to check other files
-                }
-            }
-        }
-
-        // If all files are complete for the transfer, update the transfer status
-        if ($allFilesComplete) {
-            updateTransferStatus($pdo, $transferId);
-            echo "All files downloaded for transfer ID: $transferId. Transfer status updated.\n";
-        }
-    }
-
-    // Sleep for 1 seconds before the next status check
+    // Sleep for 5 seconds before the next status check
     sleep(1);
 }
 ?>
+
 

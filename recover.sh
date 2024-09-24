@@ -60,7 +60,6 @@ mysql -u root -e "CREATE TABLE ses.transfers (uuid CHAR(36) PRIMARY KEY DEFAULT 
 
 
 function createDB_files(
- # create the db table
  echo "Creating new DB table ses.files"
  mysql -u root -e "CREATE TABLE ses.files (
     uuid VARCHAR(255) PRIMARY KEY DEFAULT (UUID()),
@@ -94,11 +93,10 @@ function createDB_files(
     fileserver_url_main VARCHAR(255),
     footer_text VARCHAR(255),
     antivirus_scan_status VARCHAR(50),
+    download_percentage INT,
     file_status VARCHAR(255),
     FOREIGN KEY (transfer_id) REFERENCES transfers(uuid)
 );"
- # Check the creation of the DB table
- 
  mysql -u root -e "DESCRIBE ses.files"
 )
 

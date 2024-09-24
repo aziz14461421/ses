@@ -110,7 +110,6 @@ function insert_files($transfer_id)
             $fileserver_url_main = $data['transfer']['fileserverurl_main'];
             $footer_text = $data['transfer']['footertext'];
             $antivirus_scan_status = "Not Scanned"; // Assuming a default value
-            
 
             // Check if the file_id already exists in the files table
             $check_file_query = "SELECT file_id, md5 FROM files WHERE file_id = '$file_id'";
