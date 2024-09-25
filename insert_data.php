@@ -10,6 +10,7 @@ $ch = curl_init();
 // Set the cURL options
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Set timeout to 5 seconds
 
 // Execute the GET request
 $response = curl_exec($ch);
@@ -34,9 +35,9 @@ $json_data = json_decode($response, true);
 
 // Check if the response is valid JSON
 if (json_last_error() === JSON_ERROR_NONE) {
-    echo "API connection successfull, Received a valid JSON response.\n";
+    echo "API connection successful, Received a valid JSON response.\n";
 } else {
-    echo "API connection successfull, but the response is not valid JSON.\n";
+    echo "API connection successful, but the response is not valid JSON.\n";
 }
 
 // Close the cURL session
