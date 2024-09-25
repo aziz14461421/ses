@@ -52,6 +52,7 @@ mysql -u root -e "CREATE TABLE ses.transfers (uuid CHAR(36) PRIMARY KEY DEFAULT 
     block_downloads BOOLEAN,
     infected BOOLEAN,
     occupies_storage BOOLEAN,
+    percentage VARCHAR(255),
     transfer_status VARCHAR(255))"
  # Check the creation of the DB table
  
