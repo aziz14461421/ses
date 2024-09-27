@@ -2,8 +2,8 @@
 // Database credentials
 $host = 'localhost';
 $dbname = 'ses';
-$user = 'root';
-$pass = '';
+$user = 'admin';
+$pass = 'admin';
 
 // aria2c RPC endpoint
 $rpcUrl = 'http://localhost:6800/jsonrpc';
