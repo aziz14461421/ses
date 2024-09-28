@@ -1,0 +1,130 @@
+async function fetchTransfers() {
+    try {
+        const response = await fetch('http://192.168.1.14/test.php');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const transfers = await response.json();
+        return transfers;
+    } catch (error) {
+        console.error('Error fetching transfers:', error);
+    }
+}
+
+function renderTransfers(transfers) {
+    const container = document.getElementById('transfers-container');
+    container.innerHTML = ''; // Clear the container before adding new data
+
+    transfers.forEach(transfer => {
+        // Create the transfer card with Tailwind CSS classes
+        const transferCard = `
+            <div class="bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <!-- Icon based on status -->
+                    <div class="text-${transfer.transfer_status === 'pending' ? 'yellow' : (transfer.transfer_status === 'downloading' ? 'blue' : 'green')}-500">
+                        <i class="fas fa-${transfer.transfer_status === 'pending' ? 'clock' : (transfer.transfer_status === 'downloading' ? 'spinner fa-spin' : 'check-circle')} fa-2x"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">${transfer.custom_field_label}</h2>
+                        <p class="text-gray-600">From: ${transfer.from_email}</p>
+                        <p class="text-gray-600">To: ${transfer.to_email}</p>
+                        <p class="text-gray-600">Number of Downloads: ${transfer.number_of_downloads}</p>
+                        <p class="text-gray-600">Status: ${transfer.transfer_status}</p>
+                        <p class="text-gray-600">Progress: ${transfer.percentage}%</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div>
+                    <button onclick="startDownload('${transfer.uuid}')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button onclick="pauseDownload('${transfer.uuid}')" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-700 transition">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button onclick="resumeDownload('${transfer.uuid}')" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 transition">
+                        <i class="fas fa-play"></i> Resume
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += transferCard;
+    });
+}
+
+// Function to start download of a specific transfer
+async function startDownload(uuid) {
+    try {
+        const response = await fetch('http://192.168.1.14/test.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uuid })
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        // Refresh the transfers list
+        fetchTransfers().then(transfers => renderTransfers(transfers));
+    } catch (error) {
+        console.error('Error starting download:', error);
+    }
+}
+
+// Function to pause download of a specific transfer
+async function pauseDownload(uuid) {
+    try {
+        const response = await fetch('http://192.168.1.14/test.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uuid, action: 'pause' })
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        // Refresh the transfers list
+        fetchTransfers().then(transfers => renderTransfers(transfers));
+    } catch (error) {
+        console.error('Error pausing download:', error);
+    }
+}
+
+// Function to resume download of a specific transfer
+async function resumeDownload(uuid) {
+    try {
+        const response = await fetch('http://192.168.1.14/test.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uuid, action: 'resume' })
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        // Refresh the transfers list
+        fetchTransfers().then(transfers => renderTransfers(transfers));
+    } catch (error) {
+        console.error('Error resuming download:', error);
+    }
+}
+
+// Periodically check progress
+async function checkProgress() {
+    const transfers = await fetchTransfers();
+    renderTransfers(transfers);
+}
+
+// Fetch and render transfers on page load
+fetchTransfers().then(transfers => renderTransfers(transfers));
+
+// Set interval to check progress every 5 seconds
+setInterval(checkProgress, 5000);
+
