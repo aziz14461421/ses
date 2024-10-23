@@ -19,10 +19,17 @@ try {
     die('Database connection failed: ' . $e->getMessage());
 }
 
-// Allow CORS for React frontend
+// Allow CORS for React frontend or other frontends
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+// Handle preflight (OPTIONS) requests
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    // Respond with 200 OK without executing the rest of the script
+    header("HTTP/1.1 200 OK");
+    exit();
+}
 
 // Function to make a JSON-RPC request to aria2c
 function sendRpcRequest($method, $params = array()) {

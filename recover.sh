@@ -100,7 +100,8 @@ function createDB_files(
 );"
  mysql -u root -e "DESCRIBE ses.files"
 )
-
+rm -r downloaded
+mkdir downloaded
 removeDB
 createDB
 createDB_transfers
