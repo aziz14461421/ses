@@ -12,9 +12,9 @@
         }
       ],
       "failedRecipients": 0,
-      "from": "user0@gmail.com",
-      "subject": "",
-      "message": "",
+      "from": "jane.doe@gmail.com",
+      "subject": "Movie: The Grand Adventure - Full Movie",
+      "message": "Here is the full movie for The Grand Adventure in HD quality.",
       "expiredate": 1696756945319,
       "extendedexpiredate": -1,
       "sentdate": 1694163645047,
@@ -28,19 +28,19 @@
       "source": "Web",
       "customfields": [
         {
-          "label": "Elokuvan titteli",
+          "label": "Movie Title",
           "visible": false,
           "rendertype": 0,
-          "value": "Filmskolan"
+          "value": "The Grand Adventure"
         }
       ],
-      "files": [],
+      "files": ["the_grand_adventure.mp4", "the_grand_adventure_subtitles.srt"],
       "numberoffiles": 8,
       "numberofdownloads": 9,
-      "downloads": [],
+      "downloads": ["user1", "user2", "user3"],
       "passwordprotected": false,
       "iconcolor": "#7FAD46",
-      "iconletter": "M",
+      "iconletter": "A",
       "ftphost": "3008.domain.com",
       "ftpcorppasswordrequired": false,
       "udpthreshold": 10000,
@@ -63,9 +63,9 @@
         }
       ],
       "failedRecipients": 0,
-      "from": "user@gmail.com",
-      "subject": "",
-      "message": "",
+      "from": "john.smith@gmail.com",
+      "subject": "Documentary: Exploring the Deep Oceans",
+      "message": "Attached is the documentary film Exploring the Deep Oceans.",
       "expiredate": 1696671194238,
       "extendedexpiredate": -1,
       "sentdate": 1694075395303,
@@ -79,19 +79,19 @@
       "source": "Web",
       "customfields": [
         {
-          "label": "Aziz titteli",
+          "label": "Movie Title",
           "visible": false,
           "rendertype": 0,
-          "value": "Filmskolan"
+          "value": "Exploring the Deep Oceans"
         }
       ],
-      "files": [],
+      "files": ["oceans_documentary.mp4", "oceans_documentary_subtitles.srt"],
       "numberoffiles": 8,
       "numberofdownloads": 1,
-      "downloads": [],
+      "downloads": ["documentary-team"],
       "passwordprotected": false,
       "iconcolor": "#7FAD46",
-      "iconletter": "M",
+      "iconletter": "D",
       "ftphost": "3009.domain.com",
       "ftpcorppasswordrequired": false,
       "udpthreshold": 10000,
@@ -114,9 +114,9 @@
         }
       ],
       "failedRecipients": 0,
-      "from": "user1@gmail.com",
-      "subject": "",
-      "message": "",
+      "from": "alice.wonderland@gmail.com",
+      "subject": "Action Movie: The Last Stand",
+      "message": "Heres the action-packed movie The Last Stand for your viewing.",
       "expiredate": 1696667058313,
       "extendedexpiredate": -1,
       "sentdate": 1694075047843,
@@ -130,19 +130,19 @@
       "source": "Web",
       "customfields": [
         {
-          "label": "Elokuvan titteli",
+          "label": "Movie Title",
           "visible": false,
           "rendertype": 0,
-          "value": "Filmskolan"
+          "value": "The Last Stand"
         }
       ],
-      "files": [],
+      "files": ["the_last_stand.mp4", "the_last_stand_subtitles.srt"],
       "numberoffiles": 11,
       "numberofdownloads": 1,
-      "downloads": [],
+      "downloads": ["action-fans"],
       "passwordprotected": false,
       "iconcolor": "#8D6AC2",
-      "iconletter": "K",
+      "iconletter": "A",
       "ftphost": "3009.domain.com",
       "ftpcorppasswordrequired": false,
       "udpthreshold": 10000,
@@ -165,9 +165,9 @@
         }
       ],
       "failedRecipients": 0,
-      "from": "user2@gmail.com",
-      "subject": "",
-      "message": "",
+      "from": "emma.wilson@gmail.com",
+      "subject": "Documentary: Life in the Arctic",
+      "message": "Sharing the documentary Life in the Arctic with you.",
       "expiredate": 1696591901898,
       "extendedexpiredate": -1,
       "sentdate": 1693992988786,
@@ -181,19 +181,19 @@
       "source": "Web",
       "customfields": [
         {
-          "label": "Elokuvan titteli",
+          "label": "Movie Title",
           "visible": false,
           "rendertype": 0,
-          "value": "Fat Dance"
+          "value": "Life in the Arctic"
         }
       ],
-      "files": [],
+      "files": ["arctic_life_documentary.mp4", "arctic_life_documentary_subtitles.srt"],
       "numberoffiles": 1,
       "numberofdownloads": 1,
-      "downloads": [],
+      "downloads": ["nature-documentary-team"],
       "passwordprotected": false,
       "iconcolor": "#C192D2",
-      "iconletter": "P",
+      "iconletter": "L",
       "ftphost": "3012.domain.com",
       "ftpcorppasswordrequired": false,
       "udpthreshold": 10000,
@@ -216,9 +216,9 @@
         }
       ],
       "failedRecipients": 0,
-      "from": "user3@gmail.com",
-      "subject": "",
-      "message": "",
+      "from": "david.brown@gmail.com",
+      "subject": "Sci-Fi Movie: The Mars Expedition",
+      "message": "Here is the exciting sci-fi movie The Mars Expedition.",
       "expiredate": 1696437331220,
       "extendedexpiredate": -1,
       "sentdate": 1693837607594,
@@ -232,19 +232,19 @@
       "source": "Web",
       "customfields": [
         {
-          "label": "Elokuvan titteli",
+          "label": "Movie Title",
           "visible": false,
           "rendertype": 0,
-          "value": "Jasmin's Two Homes"
+          "value": "The Mars Expedition"
         }
       ],
-      "files": [],
+      "files": ["mars_expedition_sci_fi.mp4", "mars_expedition_sci_fi_subtitles.srt"],
       "numberoffiles": 14,
       "numberofdownloads": 3,
-      "downloads": [],
+      "downloads": ["sci-fi-fans"],
       "passwordprotected": false,
       "iconcolor": "#C192D2",
-      "iconletter": "P",
+      "iconletter": "S",
       "ftphost": "3011.domain.com",
       "ftpcorppasswordrequired": false,
       "udpthreshold": 10000,
@@ -254,58 +254,8 @@
       "blockdownloads": false,
       "infected": false,
       "occupiesstorage": true
-    },
-    {
-      "to": [
-        "admin@domain.com"
-      ],
-      "recipients": [
-        {
-          "email": "admin@domain.com",
-          "downloadlink": "https://www.domain.com/t/tD74IqsC",
-          "delivered": true
-        }
-      ],
-      "failedRecipients": 0,
-      "from": "user4@gmail.com",
-      "subject": "",
-      "message": "",
-      "expiredate": 32503676400000,
-      "extendedexpiredate": -1,
-      "sentdate": 1622982676438,
-      "status": "STATUS_COMPLETE",
-      "id": "oprfioojadrttwh",
-      "trackid": "tD74IqsC",
-      "url": "https://www.domain.com/t/tD74IqsC",
-      "size": 984992600,
-      "days": 357415,
-      "isexpired": false,
-      "source": "Web",
-      "customfields": [
-        {
-          "label": "Elokuvan titteli",
-          "visible": false,
-          "rendertype": 0,
-          "value": "SES-alkutunnisteet_2021"
-        }
-      ],
-      "files": [],
-      "numberoffiles": 18,
-      "numberofdownloads": 124,
-      "downloads": [],
-      "passwordprotected": false,
-      "iconcolor": "#AD46A6",
-      "iconletter": "P",
-      "ftphost": "3008.domain.com",
-      "ftpcorppasswordrequired": false,
-      "udpthreshold": 10000,
-      "permanent": true,
-      "maxdays": 3650,
-      "alloweditingexpiredate": false,
-      "blockdownloads": false,
-      "infected": false,
-      "occupiesstorage": true
     }
   ],
   "responsestatus": "OK"
 }
+
