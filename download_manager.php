@@ -30,18 +30,6 @@ try {
     die('Database connection failed: ' . $e->getMessage());
 }
 
-// Allow CORS for React frontend or other frontends
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-
-// Handle preflight (OPTIONS) requests
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    // Respond with 200 OK without executing the rest of the script
-    header("HTTP/1.1 200 OK");
-    exit();
-}
-
 // Function to make a JSON-RPC request to aria2c
 function sendRpcRequest($method, $params = array()) {
     global $rpcUrl;
@@ -92,49 +80,70 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 switch ($method) {
     case 'POST':
-        // Start downloads for all files associated with a specific transfer
-        if (isset($input['uuid'])) {
+        // Check for action and uuid
+        if (isset($input['action']) && isset($input['uuid'])) {
             $uuid = $input['uuid'];
+            switch ($input['action']) {
+                case 'start':
+                    // Start downloads for all files associated with a specific transfer
+                    $stmt = $pdo->prepare("SELECT file_id, download_url, gid FROM files WHERE transfer_id = ? AND (file_status IS NULL OR file_status != 'complete')");
+                    $stmt->execute([$uuid]);
+                    $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $downloadsInitiated = 0;
 
-            // Fetch all files for the given transfer UUID where status is not 'complete'
-            $stmt = $pdo->prepare("SELECT file_id, download_url, gid FROM files WHERE transfer_id = ? AND (file_status IS NULL OR file_status != 'complete')");
-            $stmt->execute([$uuid]);
-            $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($files as $file) {
+                        $downloadUrl = $file['download_url'];
+                        $fileId = $file['file_id'];
 
-            // Track the number of downloads initiated
-            $downloadsInitiated = 0;
-
-            foreach ($files as $file) {
-                $downloadUrl = $file['download_url'];
-                $fileId = $file['file_id'];
-
-                // Check if file already has a GID (ongoing download), if not, start a new download
-                if (empty($file['gid'])) {
-                    // Start a new download via aria2c
-                    $response = sendRpcRequest('aria2.addUri', [[$downloadUrl], ['dir' => $downloadDir]]);
-
-                    if (isset($response['result'])) {
-                        // Get the GID from the response
-                        $gid = $response['result'];
-
-                        // Save the GID in the database and update file status to 'downloading'
-                        $stmt = $pdo->prepare("UPDATE files SET gid = ?, file_status = 'downloading' WHERE file_id = ?");
-                        $stmt->execute([$gid, $fileId]);
-
-                        $downloadsInitiated++;
+                        if (empty($file['gid'])) {
+                            $response = sendRpcRequest('aria2.addUri', [[$downloadUrl], ['dir' => $downloadDir]]);
+                            if (isset($response['result'])) {
+                                $gid = $response['result'];
+                                $stmt = $pdo->prepare("UPDATE files SET gid = ?, file_status = 'downloading' WHERE file_id = ?");
+                                $stmt->execute([$gid, $fileId]);
+                                $downloadsInitiated++;
+                            }
+                        }
                     }
-                }
-            }
 
-            // If downloads were initiated, update the transfer status to 'in_progress'
-            if ($downloadsInitiated > 0) {
-                updateTransferStatus($pdo, $uuid, 'in_progress', 0);
-                echo json_encode(['message' => "Downloads started for transfer $uuid"]);
-            } else {
-                echo json_encode(['message' => "No downloads were initiated. All files may have already been started or completed."]);
+                    if ($downloadsInitiated > 0) {
+                        updateTransferStatus($pdo, $uuid, 'in_progress', 0);
+                        echo json_encode(['message' => "Downloads started for transfer $uuid"]);
+                    } else {
+                        echo json_encode(['message' => "No downloads were initiated. All files may have already been started or completed."]);
+                    }
+                    break;
+
+                case 'pause':
+                    // Pause all downloads associated with the transfer
+                    $stmt = $pdo->prepare("SELECT gid FROM files WHERE transfer_id = ?");
+                    $stmt->execute([$uuid]);
+                    $gids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($gids as $gid) {
+                        sendRpcRequest('aria2.pause', [$gid]);
+                    }
+                    updateTransferStatus($pdo, $uuid, 'paused', 0);
+                    echo json_encode(['message' => "Downloads paused for transfer $uuid"]);
+                    break;
+
+                case 'resume':
+                    // Resume all downloads associated with the transfer
+                    $stmt = $pdo->prepare("SELECT gid FROM files WHERE transfer_id = ?");
+                    $stmt->execute([$uuid]);
+                    $gids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($gids as $gid) {
+                        sendRpcRequest('aria2.unpause', [$gid]);
+                    }
+                    updateTransferStatus($pdo, $uuid, 'in_progress', 0);
+                    echo json_encode(['message' => "Downloads resumed for transfer $uuid"]);
+                    break;
+
+                default:
+                    echo json_encode(['error' => 'Invalid action']);
+                    break;
             }
         } else {
-            echo json_encode(['error' => 'Missing transfer uuid']);
+            echo json_encode(['error' => 'Missing action or transfer uuid']);
         }
         break;
 
@@ -154,44 +163,32 @@ switch ($method) {
         // Periodically check the status of all files under a specific transfer and update the database
         if (isset($input['uuid'])) {
             $uuid = $input['uuid'];
-
-            // Fetch all downloads under the transfer
             $stmt = $pdo->prepare("SELECT gid FROM files WHERE transfer_id = ? AND (file_status IS NULL OR file_status != 'complete')");
             $stmt->execute([$uuid]);
             $downloads = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $allDownloadsComplete = true; // Flag to check if all downloads are complete
+            $allDownloadsComplete = true;
 
             foreach ($downloads as $download) {
                 $gid = $download['gid'];
-
-                // Get the status of the download from aria2c
                 $statusResponse = sendRpcRequest('aria2.tellStatus', [$gid]);
 
                 if (isset($statusResponse['result'])) {
                     $status = $statusResponse['result']['status'];
                     $completedSize = $statusResponse['result']['completedLength'];
                     $totalLength = $statusResponse['result']['totalLength'];
-
-                    // Calculate the percentage manually
                     $percentage = ($totalLength > 0) ? ($completedSize / $totalLength) * 100 : 0;
-
-                    // Update the database with the download status
                     updateDownloadStatus($pdo, $gid, $status, $completedSize, round($percentage, 2));
 
-                    // If the download is complete, update the status
                     if ($status === 'complete') {
                         updateDownloadStatus($pdo, $gid, 'complete', $completedSize, 100);
                     } else {
-                        $allDownloadsComplete = false; // At least one download is still in progress
+                        $allDownloadsComplete = false;
                     }
                 }
             }
 
-            // Calculate the overall transfer progress
             $transferProgress = calculateTransferProgress($pdo, $uuid);
             updateTransferStatus($pdo, $uuid, $allDownloadsComplete ? 'complete' : 'in_progress', round($transferProgress, 2));
-
             echo json_encode(['message' => 'Transfer status updated', 'progress' => $transferProgress]);
         } else {
             echo json_encode(['error' => 'Missing transfer uuid']);
@@ -203,4 +200,3 @@ switch ($method) {
         break;
 }
 ?>
-
