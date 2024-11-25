@@ -187,7 +187,10 @@ switch ($method) {
                 }
             }
 
-            $transferProgress = calculateTransferProgress($pdo, $uuid);
+	    $transferProgress = calculateTransferProgress($pdo, $uuid);
+	    if($transferProgress == 100){
+	    	$allDownloadsComplete = true;
+	    }
             updateTransferStatus($pdo, $uuid, $allDownloadsComplete ? 'complete' : 'in_progress', round($transferProgress, 2));
             echo json_encode(['message' => 'Transfer status updated', 'progress' => $transferProgress]);
         } else {
