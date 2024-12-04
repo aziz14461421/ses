@@ -20,22 +20,22 @@ This project is a Transfers Management System built using a combination of Bash 
 
 1. Clone this repository:
 
-   ```bash
-   git clone <repository-url>
-   cd <repository-directory>
-   ```
+    ```bash
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
 
 2. Make the Bash script executable:
 
-   ```bash
-   chmod +x recover.sh
-   ```
+    ```bash
+    chmod +x recover.sh
+    ```
 
 3. Run the `recover.sh` script to create the database and tables:
 
-   ```bash
-   ./recover.sh
-   ```
+    ```bash
+    ./recover.sh
+    ```
 
 4. Place your JSON files in the `./data/` directory.
 
@@ -68,23 +68,18 @@ The `download_files.php` script is responsible for managing file downloads using
 
 Before running the script, ensure that the following variables are correctly set:
 
-- **Database Credentials**:
-  ```php
-  $host = 'localhost'; // Database host
-  $dbname = 'ses';     // Database name
-  $user = 'root';      // Database user
-  $pass = '';          // Database password
-  ```
 
 - **Aria2c RPC Endpoint**:
-  ```php
-  $rpcUrl = 'http://localhost:6800/jsonrpc'; // URL for aria2c RPC
-  ```
+
+    ```php
+    $rpcUrl = 'http://localhost:6800/jsonrpc'; // URL for aria2c RPC
+    ```
 
 - **Download Directory**:
-  ```php
-  $downloadDir = __DIR__ . '/downloaded/'; // Directory for downloaded files
-  ```
+
+    ```php
+    $downloadDir = __DIR__ . '/downloaded/'; // Directory for downloaded files
+    ```
 
 #### Usage
 
@@ -110,9 +105,75 @@ The script will continuously check for ongoing transfers in the database, fetch 
 
 ## Database Schema Overview
 
-This project uses a MySQL database with two main tables: `transfers` and `files`. 
+This project uses a MySQL database with two main tables: `transfers` and `files`.
 
 For a complete overview of the database schema, including all fields and their descriptions, please refer to the [Database Schema Documentation](docs/database-schema.md).
+
+## Client-Side Application
+
+The client-side application is a simple web interface to display and manage transfers. It consists of HTML, CSS, and JavaScript files.
+
+### File Structure
+
+- `client/index.html`: The main HTML file for the client-side application.
+- `client/script.js`: JavaScript file for handling dynamic content and interactions.
+- `client/style.css`: CSS file for styling the client-side application.
+
+### Features
+
+- **Dynamic Table**: Displays a table of transfers with columns for title, subject, files, source, downloads, status, progress, and actions.
+- **Progress Bar**: Shows the download progress for each transfer.
+- **Action Buttons**: Allows users to start, pause, and resume downloads.
+
+### Usage
+
+1. Open `client/index.html` in a web browser.
+2. The table will be populated with transfer data fetched from the server.
+3. Use the action buttons to manage downloads.
+
+### Important Notes
+
+- The client-side application communicates with the server using the `download_manager.php` script.
+- Ensure that the server is running and accessible at the specified URL.
+
+## Server-Side Scripts
+
+### `download_manager.php`
+
+This script handles various actions related to download management, such as starting, pausing, and resuming downloads. It also fetches and updates the status of transfers.
+
+#### Features
+
+- **CORS Headers**: Allows cross-origin requests from any domain.
+- **Action Handling**: Supports actions like starting, pausing, and resuming downloads.
+- **Status Updates**: Fetches and updates the status of transfers and files.
+
+#### Usage
+
+The script handles different HTTP methods (GET, POST, PUT) to perform various actions:
+
+- **GET**: Fetches the status of a specific transfer or all transfers.
+- **POST**: Starts, pauses, or resumes downloads based on the action specified in the request payload.
+- **PUT**: Periodically checks the status of all files under a specific transfer and updates the database.
+
+#### Example Request
+
+To start a download for a specific transfer:
+
+```bash
+curl -X POST http://192.168.1.28:7000/download_manager.php -H "Content-Type: application/json" -d '{"action":"start", "uuid":"transfer_uuid"}'
+```
+
+To fetch the status of a specific transfer:
+
+```bash
+curl http://192.168.1.28:7000/download_manager.php?uuid=transfer_uuid
+```
+
+### Important Notes
+
+- Ensure that the `aria2c` RPC server is running and accessible at the specified URL.
+- The script updates the database with the download status and progress.
 
 ## Contributing
 
